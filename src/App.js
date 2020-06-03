@@ -1,26 +1,55 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Item from './Item';
+import Cart from './Cart';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  cartItemId = 0;
+
+  state = {
+    items: [],
+    cartItems: [],
+  };
+
+  componentDidMount = () => {
+    fetch('https://5ed0108416017c00165e327c.mockapi.io/api/v1/items')
+      .then(resp => resp.json())
+      .then(data => {
+        this.setState({items: data});
+      });
+  }
+
+  addToCart = item => {
+    this.setState(prevState => ({
+      cartItems: [...prevState.cartItems, {...item, id: this.cartItemId}]
+    }))
+
+    this.cartItemId++
+  }
+
+  removeFromCart = item => {
+    this.setState(prevState => ({
+      cartItems: prevState.cartItems.filter(cartItem => cartItem !== item)
+    }));
+  }
+
+  render = () => {
+    return (
+      <>
+        <header>
+          <h1>mouseHeav3an</h1>
+        </header>
+        <main>
+          <ul className="items">
+            {this.state.items.map(item => (
+              <Item item={item} key={item.id} onAddToCart={this.addToCart}/>
+            ))}
+          </ul>
+          <Cart cartItems={this.state.cartItems} onRemoveFromCart={this.removeFromCart}/>
+        </main>
+      </>
+    )
+  }
 }
+
 
 export default App;
